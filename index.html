@@ -449,6 +449,7 @@ body > * { position: relative; z-index: 1; }
 
 .learning-content {
   margin: 0 16px;
+  padding-bottom: 40px;
 }
 
 /* Step 1: Dialogue */
@@ -1475,7 +1476,14 @@ function renderFlashcards(container) {
       </div>` : ''}`;
   }
 
-  window.flipCard = () => { flipped = true; render(); };
+  window.flipCard = () => {
+    flipped = true;
+    render();
+    setTimeout(() => {
+      const el = document.querySelector('.flashcard-rating');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  };
   window.rateCard = (rating) => {
     ratings.push({ word: vocab[idx].word, meaning: vocab[idx].meaning, rating });
     if (rating !== 'know') {
