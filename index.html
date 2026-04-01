@@ -132,23 +132,14 @@ body > * { position: relative; z-index: 1; }
   letter-spacing: 2px;
   position: relative;
   z-index: 1;
-  display: inline-block;
-  background: rgba(15,14,23,0.6);
-  padding: 4px 14px;
-  border-radius: 8px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  color: #FFF;
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.9), 0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5);
+  -webkit-text-stroke: 0.5px rgba(0,0,0,0.3);
 }
 .header .subtitle {
-  font-size: 13px; opacity: 0.95; margin-top: 8px; color: #F0E6D3;
+  font-size: 13px; margin-top: 8px; color: #F0E6D3;
   position: relative; z-index: 1;
-  display: inline-block;
-  background: rgba(15,14,23,0.5);
-  padding: 2px 10px;
-  border-radius: 6px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.9), 0 2px 16px rgba(0,0,0,0.7);
 }
 
 /* === Page Container === */
@@ -175,23 +166,14 @@ body > * { position: relative; z-index: 1; }
   color: var(--primary);
   position: relative;
   z-index: 1;
-  display: inline-block;
-  background: rgba(15,14,23,0.55);
-  padding: 4px 20px;
-  border-radius: 12px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  text-shadow: 0 0 20px rgba(232,168,56,0.5);
+  text-shadow: 0 0 8px rgba(0,0,0,1), 0 0 16px rgba(0,0,0,0.9), 0 0 30px rgba(232,168,56,0.5), 0 2px 24px rgba(0,0,0,0.8);
+  -webkit-text-stroke: 1px rgba(0,0,0,0.4);
 }
 .streak-label {
-  font-size: 14px; opacity: 0.95; margin-top: 8px;
+  font-size: 14px; margin-top: 4px;
   position: relative; z-index: 1;
-  display: inline-block;
-  background: rgba(15,14,23,0.5);
-  padding: 2px 12px;
-  border-radius: 6px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  color: #FFF;
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.9), 0 2px 16px rgba(0,0,0,0.7);
 }
 
 .stats-row {
@@ -231,9 +213,8 @@ body > * { position: relative; z-index: 1; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
-  padding-top: 60px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 16px;
   cursor: pointer;
   transition: all 0.3s;
@@ -242,17 +223,9 @@ body > * { position: relative; z-index: 1; }
   position: relative;
   overflow: hidden;
   background-size: cover;
-  background-position: center top;
   min-height: 150px;
 }
-.category-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, rgba(15,14,23,0.85) 0%, rgba(15,14,23,0.4) 50%, transparent 100%);
-  pointer-events: none;
-  border-radius: var(--radius);
-}
+.category-card::before { display: none; }
 .category-card:active { transform: scale(0.98); }
 .category-icon {
   width: 50px;
@@ -265,15 +238,23 @@ body > * { position: relative; z-index: 1; }
   flex-shrink: 0;
 }
 .category-info { flex: 1; position: relative; z-index: 1; }
-.category-name { font-size: 17px; font-weight: 700; color: var(--text); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
-.category-desc { font-size: 12px; color: #D4C5A9; margin-top: 2px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+.category-name {
+  font-size: 17px; font-weight: 700; color: #FFF;
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.9), 0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5);
+  -webkit-text-stroke: 0.5px rgba(0,0,0,0.3);
+}
+.category-desc {
+  font-size: 12px; color: #F0E6D3; margin-top: 2px;
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.9), 0 2px 16px rgba(0,0,0,0.7);
+}
 .category-progress {
   width: 100%;
   height: 6px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.5);
   border-radius: 3px;
   margin-top: 8px;
   overflow: hidden;
+  box-shadow: 0 0 4px rgba(0,0,0,0.6);
 }
 .category-progress-fill {
   height: 100%;
@@ -398,21 +379,17 @@ body > * { position: relative; z-index: 1; }
 }
 .learning-header::before { display: none; }
 .learning-header .back-btn {
-  background: rgba(15,14,23,0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.15);
   color: var(--text); border-color: rgba(255,255,255,0.2);
   position: relative; z-index: 1;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
 }
 .learning-header h2 {
   font-size: 16px; flex: 1;
   position: relative; z-index: 1;
-  background: rgba(15,14,23,0.55);
-  padding: 4px 12px;
-  border-radius: 8px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  color: #FFF;
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.9), 0 2px 20px rgba(0,0,0,0.8);
+  -webkit-text-stroke: 0.3px rgba(0,0,0,0.3);
 }
 
 .step-progress {
@@ -593,23 +570,15 @@ body > * { position: relative; z-index: 1; }
   color: var(--primary);
   position: relative;
   z-index: 1;
-  background: rgba(15,14,23,0.6);
-  padding: 6px 20px;
-  border-radius: 10px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  text-shadow: 0 0 12px rgba(232,168,56,0.4);
+  text-shadow: 0 0 8px rgba(0,0,0,1), 0 0 16px rgba(0,0,0,0.9), 0 0 30px rgba(232,168,56,0.4), 0 2px 24px rgba(0,0,0,0.8);
+  -webkit-text-stroke: 0.5px rgba(0,0,0,0.4);
 }
 .flashcard-phonetic {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #D4C5A9;
   position: relative;
   z-index: 1;
-  background: rgba(15,14,23,0.5);
-  padding: 2px 12px;
-  border-radius: 6px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.9), 0 2px 16px rgba(0,0,0,0.7);
 }
 .flashcard-back {
   background: linear-gradient(135deg, #C23B22 0%, #8B1A1A 40%, #2B3A67 100%);
@@ -1319,9 +1288,9 @@ function renderDashboard() {
 
   // Category cards
   const categories = [
-    { id: 'work', name: '工作场景', desc: '项目管理·会议·协作', icon: '💼', color: '#4A90D9', bg: 'images/work-bg.jpg' },
-    { id: 'travel', name: '旅游场景', desc: '出行·住宿·观光', icon: '✈️', color: '#34C759', bg: 'images/travel-bg.jpg' },
-    { id: 'life', name: '生活场景', desc: '日常·社交·办事', icon: '🏠', color: '#FF9500', bg: 'images/life-bg.jpg' },
+    { id: 'work', name: '工作场景', desc: '项目管理·会议·协作', icon: '💼', color: '#4A90D9', bg: 'images/work-bg.jpg', bgPos: 'center center' },
+    { id: 'travel', name: '旅游场景', desc: '出行·住宿·观光', icon: '✈️', color: '#34C759', bg: 'images/travel-bg.jpg', bgPos: 'center top' },
+    { id: 'life', name: '生活场景', desc: '日常·社交·办事', icon: '🏠', color: '#FF9500', bg: 'images/life-bg.jpg', bgPos: 'center center' },
   ];
   const cardsHtml = categories.map(c => {
     const data = getCategoryData(c.id);
@@ -1329,7 +1298,7 @@ function renderDashboard() {
     const completed = data.filter(d => state.completedDays[`${c.id}_${d.day}`]).length;
     const pct = total > 0 ? Math.round(completed / total * 100) : 0;
     return `
-      <button class="category-card" style="background-image:url('${c.bg}')" onclick="showDayList('${c.id}')">
+      <button class="category-card" style="background-image:url('${c.bg}');background-position:${c.bgPos}" onclick="showDayList('${c.id}')">
         <div class="category-icon" style="background:${c.color}15;color:${c.color};position:relative;z-index:1">${c.icon}</div>
         <div class="category-info">
           <div class="category-name">${c.name}</div>
@@ -1488,7 +1457,7 @@ function renderFlashcards(container) {
           <div class="flashcard-front">
             <div class="flashcard-word">${v.word}</div>
             <div class="flashcard-phonetic">${v.phonetic || ''}</div>
-            <div style="font-size:12px;color:var(--text-secondary);margin-top:16px;position:relative;z-index:1">点击翻转查看释义</div>
+            <div style="font-size:12px;color:#D4C5A9;margin-top:16px;position:relative;z-index:1;text-shadow:0 0 6px rgba(0,0,0,1),0 0 12px rgba(0,0,0,0.9)">点击翻转查看释义</div>
           </div>
           <div class="flashcard-back">
             <div class="flashcard-meaning">${v.meaning}</div>
@@ -1864,7 +1833,7 @@ function startReviewSession() {
           <div class="flashcard" id="reviewCard" onclick="document.getElementById('reviewCard').classList.add('flipped');document.getElementById('reviewRating').classList.remove('hidden')">
             <div class="flashcard-front">
               <div class="flashcard-word">${r.word}</div>
-              <div style="font-size:12px;color:var(--text-secondary);margin-top:16px;position:relative;z-index:1">点击翻转查看释义</div>
+              <div style="font-size:12px;color:#D4C5A9;margin-top:16px;position:relative;z-index:1;text-shadow:0 0 6px rgba(0,0,0,1),0 0 12px rgba(0,0,0,0.9)">点击翻转查看释义</div>
             </div>
             <div class="flashcard-back">
               <div class="flashcard-meaning">${r.meaning}</div>
