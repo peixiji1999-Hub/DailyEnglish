@@ -1447,7 +1447,6 @@ function renderDialogue(container) {
 function renderFlashcards(container) {
   const vocab = currentLesson.vocabulary;
   let idx = 0;
-  let flipped = false;
   let ratings = [];
 
   function render() {
@@ -1455,7 +1454,7 @@ function renderFlashcards(container) {
     container.innerHTML = `
       <div class="flashcard-counter">${idx + 1} / ${vocab.length}</div>
       <div class="flashcard-container">
-        <div class="flashcard ${flipped ? 'flipped' : ''}" onclick="flipCard()">
+        <div class="flashcard" id="fcCard" onclick="flipCard()">
           <div class="flashcard-front">
             <div class="flashcard-word">${v.word}</div>
             <div class="flashcard-phonetic">${v.phonetic || ''}</div>
@@ -1468,21 +1467,22 @@ function renderFlashcards(container) {
           </div>
         </div>
       </div>
-      ${flipped ? `
-      <div class="flashcard-rating">
+      <div class="flashcard-rating" id="fcRating" style="display:none;">
         <button class="rating-btn know" onclick="rateCard('know')">认识 👍</button>
         <button class="rating-btn fuzzy" onclick="rateCard('fuzzy')">模糊 🤔</button>
         <button class="rating-btn unknown" onclick="rateCard('unknown')">不认识 😅</button>
-      </div>` : ''}`;
+      </div>`;
   }
 
   window.flipCard = () => {
-    flipped = true;
-    render();
+    const card = document.getElementById('fcCard');
+    const rating = document.getElementById('fcRating');
+    if (!card || card.classList.contains('flipped')) return;
+    card.classList.add('flipped');
+    rating.style.display = 'flex';
     setTimeout(() => {
-      const el = document.querySelector('.flashcard-rating');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+      rating.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
   };
   window.rateCard = (rating) => {
     ratings.push({ word: vocab[idx].word, meaning: vocab[idx].meaning, rating });
@@ -1490,7 +1490,6 @@ function renderFlashcards(container) {
       addToReviewPool(vocab[idx], currentLesson.category, currentLesson.day, rating === 'unknown' ? 1 : 2);
     }
     idx++;
-    flipped = false;
     if (idx >= vocab.length) {
       completeStep(1, ratings);
     } else {
