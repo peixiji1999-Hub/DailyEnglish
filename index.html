@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>英语每日打卡 - DailyEnglish</title>
+<style>
+:root {
+  --primary: #4A90D9;
+  --primary-dark: #3A7BC8;
+  --primary-light: #E8F0FE;
+  --success: #34C759;
+  --warning: #FF9500;
+  --danger: #FF3B30;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #1D1D1F;
+  --text-secondary: #6E6E73;
+  --border: #E5E5EA;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+  overflow-x: hidden;
+}
+
+/* === Navigation Bar === */
+.nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+  z-index: 100;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 4px 12px;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+  border: none;
+  background: none;
+  font-size: 10px;
+}
+.nav-item.active { color: var(--primary); }
+.nav-item svg { width: 24px; height: 24px; }
+
+/* === Header === */
+.header {
+  background: linear-gradient(135deg, var(--primary), #6FB1FC);
+  color: white;
+  padding: 20px;
+  padding-top: env(safe-area-inset-top, 20px);
+}
+.header h1 { font-size: 22px; font-weight: 700; }
+.header .subtitle { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+/* === Page Container === */
+.page { display: none; }
+.page.active { display: block; }
+
+/* === Dashboard === */
+.streak-card {
+  background: linear-gradient(135deg, var(--primary), #6FB1FC);
+  color: white;
+  margin: 16px;
+  padding: 24px;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.streak-number { font-size: 48px; font-weight: 800; }
+.streak-label { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin: 0 16px;
+}
+.stat-card {
+  flex: 1;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-value { font-size: 24px; font-weight: 700; color: var(--primary); }
+.stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 24px 16px 12px;
+}
+
+.category-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 16px;
+}
+.category-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+.category-card:active { transform: scale(0.98); }
+.category-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.category-info { flex: 1; }
+.category-name { font-size: 16px; font-weight: 600; }
+.category-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.category-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.category-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s;
+}
+
+/* Review reminder */
+.review-reminder {
+  margin: 16px;
+  padding: 16px;
+  background: #FFF8E1;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--warning);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.review-reminder .icon { font-size: 24px; }
+.review-reminder .text { font-size: 14px; color: #795548; }
+.review-reminder .count { font-weight: 700; color: var(--warning); }
+
+/* === Day List === */
+.day-list-header {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.day-list-header h2 { font-size: 20px; font-weight: 700; }
+
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 0 16px 16px;
+}
+.day-cell {
+  aspect-ratio: 1;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  position: relative;
+}
+.day-cell:active { transform: scale(0.95); }
+.day-cell.completed { background: #E8F5E9; color: var(--success); border-color: var(--success); }
+.day-cell.current { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.day-cell.locked { opacity: 0.4; cursor: not-allowed; }
+.day-cell .day-num { font-size: 18px; }
+.day-cell .day-label { font-size: 9px; color: var(--text-secondary); margin-top: 2px; }
+.day-cell .check-mark {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 12px;
+}
+.level-divider {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 8px 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.level-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* === Learning Page === */
+.learning-header {
+  background: linear-gradient(135deg, var(--primary), #6FB1FC);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.learning-header .back-btn { background: rgba(255,255,255,0.2); color: white; }
+.learning-header h2 { font-size: 16px; flex: 1; }
+
+.step-progress {
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  margin: 16px 0;
+}
+.step-dot {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.step-dot::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  margin: 0 auto 4px;
+  line-height: 28px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.step-dot.active::before { background: var(--primary); color: white; }
+.step-dot.completed::before { background: var(--success); color: white; }
+.step-dot:nth-child(1)::before { content: '1'; }
+.step-dot:nth-child(2)::before { content: '2'; }
+.step-dot:nth-child(3)::before { content: '3'; }
+.step-dot:nth-child(4)::before { content: '4'; }
+.step-connector {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  z-index: -1;
+}
+.step-dot.completed .step-connector { background: var(--success); }
+
+.learning-content {
+  margin: 0 16px;
+}
+
+/* Step 1: Dialogue */
+.dialogue-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.dialogue-line {
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.dialogue-line:last-child { margin-bottom: 0; }
+.dialogue-speaker {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.dialogue-speaker.other { color: var(--text-secondary); }
+.dialogue-en {
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 2px;
+}
+.dialogue-en .keyword {
+  background: #FFF3CD;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.dialogue-cn {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: none;
+}
+.dialogue-cn.show { display: block; }
+.dialogue-grammar {
+  font-size: 11px;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+  display: none;
+}
+.dialogue-grammar.show { display: inline-block; }
+
+.toggle-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.toggle-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.toggle-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Step 2: Flashcard */
+.flashcard-container {
+  perspective: 1000px;
+  margin: 20px 0;
+}
+.flashcard {
+  width: 100%;
+  min-height: 200px;
+  position: relative;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+.flashcard.flipped { transform: rotateY(180deg); }
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  width: 100%;
+  min-height: 200px;
+  backface-visibility: hidden;
+  border-radius: var(--radius);
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+}
+.flashcard-front {
+  background: var(--card);
+}
+.flashcard-word {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.flashcard-phonetic {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.flashcard-back {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: rotateY(180deg);
+}
+.flashcard-meaning {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.flashcard-example {
+  font-size: 14px;
+  text-align: center;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+.flashcard-counter {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.flashcard-rating {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.rating-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.rating-btn:active { transform: scale(0.95); }
+.rating-btn.know { background: #E8F5E9; color: var(--success); }
+.rating-btn.fuzzy { background: #FFF8E1; color: var(--warning); }
+.rating-btn.unknown { background: #FFEBEE; color: var(--danger); }
+
+/* Step 3: Exercise */
+.exercise-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.exercise-counter {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.exercise-question {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.exercise-question .blank {
+  display: inline-block;
+  min-width: 80px;
+  border-bottom: 2px solid var(--primary);
+  margin: 0 4px;
+  text-align: center;
+  color: var(--primary);
+  font-weight: 700;
+}
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.option-btn {
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--card);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.option-btn:active { transform: scale(0.97); }
+.option-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+.option-btn.correct { border-color: var(--success); background: #E8F5E9; }
+.option-btn.wrong { border-color: var(--danger); background: #FFEBEE; }
+
+.fill-input-group {
+  display: flex;
+  gap: 10px;
+}
+.fill-input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.fill-input:focus { border-color: var(--primary); }
+.fill-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+.submit-btn {
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.submit-btn:active { background: var(--primary-dark); }
+
+.exercise-feedback {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  display: none;
+}
+.exercise-feedback.show { display: block; }
+.exercise-feedback.correct { background: #E8F5E9; color: #2E7D32; }
+.exercise-feedback.wrong { background: #FFEBEE; color: #C62828; }
+
+/* Step 4: Role Play */
+.roleplay-scenario {
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.roleplay-role {
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-bubble.other {
+  align-self: flex-start;
+  background: var(--card);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.chat-bubble.user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.chat-bubble .cn {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+.chat-input-area {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chat-prompt {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  background: #FFF8E1;
+  border-radius: var(--radius-sm);
+}
+.chat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chat-option {
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+.chat-option:active { transform: scale(0.98); }
+.chat-option.correct { border-color: var(--success); background: #E8F5E9; }
+.chat-option.wrong { border-color: var(--danger); background: #FFEBEE; }
+
+/* === Result Page === */
+.result-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  margin: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.result-icon { font-size: 64px; margin-bottom: 16px; }
+.result-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.result-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+.result-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 24px;
+}
+.result-stat-item { text-align: center; }
+.result-stat-value { font-size: 28px; font-weight: 700; color: var(--primary); }
+.result-stat-label { font-size: 11px; color: var(--text-secondary); }
+
+.primary-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 10px;
+}
+.primary-btn:active { background: var(--primary-dark); }
+.secondary-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--card);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* === Review Page === */
+.review-list {
+  margin: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.review-item {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+.review-word { font-size: 16px; font-weight: 600; }
+.review-meaning { font-size: 12px; color: var(--text-secondary); }
+.review-due {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.review-due.now { background: #FFEBEE; color: var(--danger); }
+.review-due.later { background: #E8F5E9; color: var(--success); }
+
+/* === Profile Page === */
+.profile-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  margin: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.profile-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.profile-stat {
+  text-align: center;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.profile-stat .value { font-size: 22px; font-weight: 700; color: var(--primary); }
+.profile-stat .label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 16px;
+}
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+.calendar-day.checked { background: var(--success); color: white; font-weight: 600; }
+.calendar-day.today { border: 2px solid var(--primary); color: var(--primary); font-weight: 600; }
+.calendar-day-header { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-align: center; }
+
+/* === Pass Gate Overlay === */
+.gate-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  display: none;
+}
+.gate-overlay.show { display: flex; }
+.gate-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 24px;
+  text-align: center;
+  max-width: 320px;
+}
+.gate-icon { font-size: 48px; margin-bottom: 12px; }
+.gate-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.gate-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+
+/* === Empty State === */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state .text { font-size: 14px; }
+
+/* Next button */
+.next-step-btn {
+  margin: 20px 0;
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.next-step-btn:disabled {
+  background: var(--border);
+  cursor: not-allowed;
+}
+
+/* Utility */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 14px;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* Weekly quiz indicator */
+.weekly-quiz-banner {
+  margin: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.weekly-quiz-banner .icon { font-size: 24px; }
+.weekly-quiz-banner .text { font-size: 14px; font-weight: 600; }
+
+/* Score bar */
+.score-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.score-bar-fill {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.score-bar-inner {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s;
+}
+.score-bar-text {
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+}
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Gate Overlay -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-card">
+    <div class="gate-icon" id="gateIcon"></div>
+    <div class="gate-title" id="gateTitle"></div>
+    <div class="gate-desc" id="gateDesc"></div>
+    <button class="primary-btn" id="gateBtn" onclick="closeGate()">重新练习</button>
+  </div>
+</div>
+
+<!-- ========== Page: Dashboard ========== -->
+<div class="page active" id="pageDashboard">
+  <div class="header">
+    <h1>DailyEnglish</h1>
+    <div class="subtitle">每日英语打卡，轻松掌握实用口语</div>
+  </div>
+
+  <div class="streak-card">
+    <div class="streak-number" id="streakCount">0</div>
+    <div class="streak-label">连续打卡天数</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value" id="totalWords">0</div>
+      <div class="stat-label">已学词汇</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="totalDays">0</div>
+      <div class="stat-label">完成天数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="accuracy">0%</div>
+      <div class="stat-label">正确率</div>
+    </div>
+  </div>
+
+  <div id="reviewReminder"></div>
+
+  <div class="section-title">选择学习场景</div>
+  <div class="category-cards" id="categoryCards"></div>
+</div>
+
+<!-- ========== Page: Day List ========== -->
+<div class="page" id="pageDayList">
+  <div class="day-list-header">
+    <button class="back-btn" onclick="showPage('pageDashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <h2 id="dayListTitle"></h2>
+  </div>
+  <div id="dayListContent"></div>
+</div>
+
+<!-- ========== Page: Learning ========== -->
+<div class="page" id="pageLearning">
+  <div class="learning-header">
+    <button class="back-btn" onclick="exitLearning()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <h2 id="learningTitle"></h2>
+  </div>
+
+  <div class="step-progress">
+    <div class="step-dot" data-step="0"><span class="step-connector"></span>对话</div>
+    <div class="step-dot" data-step="1"><span class="step-connector"></span>闪卡</div>
+    <div class="step-dot" data-step="2"><span class="step-connector"></span>测试</div>
+    <div class="step-dot" data-step="3">角色扮演</div>
+  </div>
+
+  <div class="learning-content" id="learningContent"></div>
+</div>
+
+<!-- ========== Page: Review ========== -->
+<div class="page" id="pageReview">
+  <div class="day-list-header">
+    <button class="back-btn" onclick="showPage('pageDashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <h2>复习中心</h2>
+  </div>
+  <div id="reviewContent"></div>
+</div>
+
+<!-- ========== Page: Profile ========== -->
+<div class="page" id="pageProfile">
+  <div class="header">
+    <h1>个人中心</h1>
+    <div class="subtitle">学习数据统计</div>
+  </div>
+  <div id="profileContent"></div>
+</div>
+
+<!-- ========== Page: Result ========== -->
+<div class="page" id="pageResult">
+  <div id="resultContent"></div>
+</div>
+
+<!-- ========== Bottom Nav ========== -->
+<div class="nav-bar">
+  <button class="nav-item active" onclick="showPage('pageDashboard')" data-page="pageDashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>首页</span>
+  </button>
+  <button class="nav-item" onclick="showPage('pageReview')" data-page="pageReview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>复习</span>
+  </button>
+  <button class="nav-item" onclick="showPage('pageProfile')" data-page="pageProfile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>我的</span>
+  </button>
+</div>
+
+<script src="data.js"></script>
+<script>
+// ===== App State =====
+const APP_KEY = 'dailyenglish_v1';
+
+function getState() {
+  const def = {
+    completedDays: {},   // { "work_1": true, ... }
+    currentDay: {},      // { work: 1, travel: 1, life: 1 }
+    streakCount: 0,
+    lastCheckIn: null,
+    reviewPool: [],      // [{ word, meaning, nextReview, interval, category, day }]
+    exerciseHistory: [], // [{ date, correct, total }]
+    vocabLearned: 0,
+    stepScores: {},      // { "work_1_2": 85, ... }
+  };
+  try {
+    const saved = JSON.parse(localStorage.getItem(APP_KEY));
+    return saved ? { ...def, ...saved } : def;
+  } catch { return def; }
+}
+
+function saveState(state) {
+  localStorage.setItem(APP_KEY, JSON.stringify(state));
+}
+
+let state = getState();
+let currentLesson = null;
+let currentStep = 0;
+let stepResults = { 0: null, 1: null, 2: null, 3: null };
+
+// ===== Data Access =====
+function getAllData() {
+  return [...(typeof workData !== 'undefined' ? workData : []),
+          ...(typeof travelData !== 'undefined' ? travelData : []),
+          ...(typeof lifeData !== 'undefined' ? lifeData : [])];
+}
+
+function getCategoryData(category) {
+  switch(category) {
+    case 'work': return typeof workData !== 'undefined' ? workData : [];
+    case 'travel': return typeof travelData !== 'undefined' ? travelData : [];
+    case 'life': return typeof lifeData !== 'undefined' ? lifeData : [];
+    default: return [];
+  }
+}
+
+function getLesson(category, day) {
+  return getCategoryData(category).find(d => d.day === day);
+}
+
+// ===== Navigation =====
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === pageId);
+  });
+  if (pageId === 'pageDashboard') renderDashboard();
+  if (pageId === 'pageReview') renderReview();
+  if (pageId === 'pageProfile') renderProfile();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== Dashboard =====
+function renderDashboard() {
+  state = getState();
+  updateStreak();
+  document.getElementById('streakCount').textContent = state.streakCount;
+  document.getElementById('totalWords').textContent = state.vocabLearned;
+  document.getElementById('totalDays').textContent = Object.keys(state.completedDays).length;
+
+  const hist = state.exerciseHistory;
+  if (hist.length > 0) {
+    const total = hist.reduce((s, h) => s + h.total, 0);
+    const correct = hist.reduce((s, h) => s + h.correct, 0);
+    document.getElementById('accuracy').textContent = total > 0 ? Math.round(correct / total * 100) + '%' : '0%';
+  }
+
+  // Review reminder
+  const dueReviews = getDueReviews();
+  const reminderEl = document.getElementById('reviewReminder');
+  if (dueReviews.length > 0) {
+    reminderEl.innerHTML = `
+      <div class="review-reminder" onclick="showPage('pageReview')">
+        <div class="icon">📖</div>
+        <div class="text">你有 <span class="count">${dueReviews.length}</span> 个词汇待复习</div>
+      </div>`;
+  } else {
+    reminderEl.innerHTML = '';
+  }
+
+  // Category cards
+  const categories = [
+    { id: 'work', name: '工作场景', desc: '项目管理·会议·协作', icon: '💼', color: '#4A90D9' },
+    { id: 'travel', name: '旅游场景', desc: '出行·住宿·观光', icon: '✈️', color: '#34C759' },
+    { id: 'life', name: '生活场景', desc: '日常·社交·办事', icon: '🏠', color: '#FF9500' },
+  ];
+  const cardsHtml = categories.map(c => {
+    const data = getCategoryData(c.id);
+    const total = data.length;
+    const completed = data.filter(d => state.completedDays[`${c.id}_${d.day}`]).length;
+    const pct = total > 0 ? Math.round(completed / total * 100) : 0;
+    return `
+      <button class="category-card" onclick="showDayList('${c.id}')">
+        <div class="category-icon" style="background:${c.color}15;color:${c.color}">${c.icon}</div>
+        <div class="category-info">
+          <div class="category-name">${c.name}</div>
+          <div class="category-desc">${c.desc} · ${completed}/${total}天</div>
+          <div class="category-progress">
+            <div class="category-progress-fill" style="width:${pct}%;background:${c.color}"></div>
+          </div>
+        </div>
+      </button>`;
+  }).join('');
+  document.getElementById('categoryCards').innerHTML = cardsHtml;
+}
+
+function updateStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (state.lastCheckIn === today) return;
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (state.lastCheckIn !== yesterday && state.lastCheckIn !== today) {
+    state.streakCount = 0;
+  }
+  saveState(state);
+}
+
+// ===== Day List =====
+function showDayList(category) {
+  const titles = { work: '工作场景', travel: '旅游场景', life: '生活场景' };
+  document.getElementById('dayListTitle').textContent = titles[category];
+
+  const data = getCategoryData(category);
+  const levels = [
+    { name: 'L1 入门', days: data.filter(d => d.level === 1) },
+    { name: 'L2 进阶', days: data.filter(d => d.level === 2) },
+    { name: 'L3 熟练', days: data.filter(d => d.level === 3) },
+    { name: 'L4 精通', days: data.filter(d => d.level === 4) },
+  ];
+
+  const currentDay = state.currentDay[category] || 1;
+  let html = '<div class="day-grid">';
+  levels.forEach(level => {
+    if (level.days.length === 0) return;
+    html += `<div class="level-divider">${level.name}</div>`;
+    level.days.forEach(d => {
+      const key = `${category}_${d.day}`;
+      const isCompleted = state.completedDays[key];
+      const isCurrent = d.day === currentDay && !isCompleted;
+      const isLocked = d.day > currentDay && !isCompleted;
+      let cls = '';
+      if (isCompleted) cls = 'completed';
+      else if (isCurrent) cls = 'current';
+      else if (isLocked) cls = 'locked';
+      html += `
+        <div class="day-cell ${cls}" onclick="${isLocked ? '' : `startLesson('${category}',${d.day})`}">
+          ${isCompleted ? '<span class="check-mark">✓</span>' : ''}
+          <div class="day-num">${d.day}</div>
+          <div class="day-label">${d.titleCn.slice(0, 4)}</div>
+        </div>`;
+    });
+  });
+  html += '</div>';
+  document.getElementById('dayListContent').innerHTML = html;
+  showPage('pageDayList');
+}
+
+// ===== Learning Flow =====
+function startLesson(category, day) {
+  currentLesson = getLesson(category, day);
+  if (!currentLesson) { showToast('课程数据未找到'); return; }
+  currentStep = 0;
+  stepResults = { 0: null, 1: null, 2: null, 3: null };
+  document.getElementById('learningTitle').textContent = `Day ${day}: ${currentLesson.titleCn}`;
+  updateStepProgress();
+  renderStep(0);
+  showPage('pageLearning');
+}
+
+function exitLearning() {
+  showDayList(currentLesson.category);
+}
+
+function updateStepProgress() {
+  document.querySelectorAll('.step-dot').forEach((dot, i) => {
+    dot.classList.remove('active', 'completed');
+    if (i === currentStep) dot.classList.add('active');
+    else if (stepResults[i] !== null) dot.classList.add('completed');
+  });
+}
+
+function renderStep(step) {
+  currentStep = step;
+  updateStepProgress();
+  const content = document.getElementById('learningContent');
+  switch(step) {
+    case 0: renderDialogue(content); break;
+    case 1: renderFlashcards(content); break;
+    case 2: renderExercises(content); break;
+    case 3: renderRolePlay(content); break;
+  }
+}
+
+// Step 1: Dialogue
+function renderDialogue(container) {
+  const d = currentLesson.dialogue;
+  let showCn = false;
+  let showGrammar = false;
+
+  function render() {
+    let html = `
+      <div class="toggle-bar">
+        <button class="toggle-btn ${showCn ? 'active' : ''}" onclick="toggleDialogueCn()">显示翻译</button>
+        <button class="toggle-btn ${showGrammar ? 'active' : ''}" onclick="toggleDialogueGrammar()">语法要点</button>
+      </div>
+      <div class="dialogue-box">`;
+    d.forEach((line, i) => {
+      const isA = line.speaker === 'A';
+      let enText = line.en;
+      if (line.keyWords) {
+        line.keyWords.forEach(kw => {
+          const regex = new RegExp(`(${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+          enText = enText.replace(regex, '<span class="keyword">$1</span>');
+        });
+      }
+      html += `
+        <div class="dialogue-line" onclick="toggleLineCn(${i})">
+          <div class="dialogue-speaker ${isA ? '' : 'other'}">${line.role || line.speaker}</div>
+          <div class="dialogue-en">${enText}</div>
+          <div class="dialogue-cn ${showCn ? 'show' : ''}" id="lineCn${i}">${line.cn}</div>
+          ${line.grammar ? `<div class="dialogue-grammar ${showGrammar ? 'show' : ''}" id="lineGr${i}">${line.grammar}</div>` : ''}
+        </div>`;
+    });
+    html += '</div>';
+    html += `<button class="next-step-btn" onclick="completeStep(0)">学完了，下一步 →</button>`;
+    container.innerHTML = html;
+  }
+
+  window.toggleDialogueCn = () => { showCn = !showCn; render(); };
+  window.toggleDialogueGrammar = () => { showGrammar = !showGrammar; render(); };
+  window.toggleLineCn = (i) => {
+    const el = document.getElementById('lineCn' + i);
+    if (el) el.classList.toggle('show');
+  };
+  render();
+}
+
+// Step 2: Flashcards
+function renderFlashcards(container) {
+  const vocab = currentLesson.vocabulary;
+  let idx = 0;
+  let flipped = false;
+  let ratings = [];
+
+  function render() {
+    const v = vocab[idx];
+    container.innerHTML = `
+      <div class="flashcard-counter">${idx + 1} / ${vocab.length}</div>
+      <div class="flashcard-container">
+        <div class="flashcard ${flipped ? 'flipped' : ''}" onclick="flipCard()">
+          <div class="flashcard-front">
+            <div class="flashcard-word">${v.word}</div>
+            <div class="flashcard-phonetic">${v.phonetic || ''}</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:16px">点击翻转查看释义</div>
+          </div>
+          <div class="flashcard-back">
+            <div class="flashcard-meaning">${v.meaning}</div>
+            <div class="flashcard-example">${v.example}</div>
+            <div class="flashcard-example" style="opacity:0.7;margin-top:4px">${v.exampleCn}</div>
+          </div>
+        </div>
+      </div>
+      ${flipped ? `
+      <div class="flashcard-rating">
+        <button class="rating-btn know" onclick="rateCard('know')">认识 👍</button>
+        <button class="rating-btn fuzzy" onclick="rateCard('fuzzy')">模糊 🤔</button>
+        <button class="rating-btn unknown" onclick="rateCard('unknown')">不认识 😅</button>
+      </div>` : ''}`;
+  }
+
+  window.flipCard = () => { flipped = true; render(); };
+  window.rateCard = (rating) => {
+    ratings.push({ word: vocab[idx].word, meaning: vocab[idx].meaning, rating });
+    if (rating !== 'know') {
+      addToReviewPool(vocab[idx], currentLesson.category, currentLesson.day, rating === 'unknown' ? 1 : 2);
+    }
+    idx++;
+    flipped = false;
+    if (idx >= vocab.length) {
+      completeStep(1, ratings);
+    } else {
+      render();
+    }
+  };
+  render();
+}
+
+// Step 3: Exercises
+function renderExercises(container) {
+  const exercises = currentLesson.exercises;
+  let idx = 0;
+  let correctCount = 0;
+  let answered = false;
+
+  function render() {
+    if (idx >= exercises.length) {
+      const score = Math.round(correctCount / exercises.length * 100);
+      if (score < 80) {
+        showGate('😤', '还需要加油！', `正确率 ${score}%，需要达到80%才能继续。`, () => {
+          idx = 0; correctCount = 0; answered = false; render();
+        });
+        return;
+      }
+      completeStep(2, { correct: correctCount, total: exercises.length });
+      return;
+    }
+    const ex = exercises[idx];
+    answered = false;
+    let html = `<div class="exercise-box">
+      <div class="exercise-counter">第 ${idx + 1} / ${exercises.length} 题</div>`;
+
+    if (ex.type === 'choice') {
+      html += `<div class="exercise-question">${ex.question.replace('___', '<span class="blank">____</span>')}</div>
+        <div class="options-grid">
+          ${ex.options.map((o, i) => `<button class="option-btn" id="opt${i}" onclick="checkChoice(${i},${ex.answer})">${o}</button>`).join('')}
+        </div>`;
+    } else {
+      html += `<div class="exercise-question">${ex.sentence.replace('___', '<span class="blank">____</span>')}</div>
+        <div class="fill-hint">提示：${ex.hint}</div>
+        <div class="fill-input-group mt-16">
+          <input class="fill-input" id="fillInput" placeholder="输入答案..." onkeypress="if(event.key==='Enter')checkFill()">
+          <button class="submit-btn" onclick="checkFill()">确认</button>
+        </div>`;
+    }
+    html += `<div class="exercise-feedback" id="exFeedback"></div></div>`;
+    container.innerHTML = html;
+    const inp = document.getElementById('fillInput');
+    if (inp) inp.focus();
+  }
+
+  window.checkChoice = (selected, answer) => {
+    if (answered) return;
+    answered = true;
+    const fb = document.getElementById('exFeedback');
+    if (selected === answer) {
+      correctCount++;
+      document.getElementById('opt' + selected).classList.add('correct');
+      fb.className = 'exercise-feedback show correct';
+      fb.textContent = '✓ 正确！' + (currentLesson.exercises[idx].explanation ? ' ' + currentLesson.exercises[idx].explanation : '');
+    } else {
+      document.getElementById('opt' + selected).classList.add('wrong');
+      document.getElementById('opt' + answer).classList.add('correct');
+      fb.className = 'exercise-feedback show wrong';
+      fb.textContent = '✗ 错误。' + (currentLesson.exercises[idx].explanation || '');
+    }
+    setTimeout(() => { idx++; render(); }, 1800);
+  };
+
+  window.checkFill = () => {
+    if (answered) return;
+    answered = true;
+    const input = document.getElementById('fillInput').value.trim().toLowerCase();
+    const ex = currentLesson.exercises[idx];
+    const acceptable = [ex.answer.toLowerCase(), ...(ex.acceptableAnswers || []).map(a => a.toLowerCase())];
+    const fb = document.getElementById('exFeedback');
+    if (acceptable.includes(input)) {
+      correctCount++;
+      fb.className = 'exercise-feedback show correct';
+      fb.textContent = `✓ 正确！答案：${ex.answer}`;
+    } else {
+      fb.className = 'exercise-feedback show wrong';
+      fb.textContent = `✗ 错误。正确答案：${ex.answer}`;
+    }
+    setTimeout(() => { idx++; render(); }, 1800);
+  };
+
+  render();
+}
+
+// Step 4: Role Play
+function renderRolePlay(container) {
+  const rp = currentLesson.rolePlay;
+  let lineIdx = 0;
+  let correctCount = 0;
+  let totalUser = rp.lines.filter(l => l.speaker === 'user').length;
+  let chatHtml = [];
+  let answered = false;
+
+  function render() {
+    let html = `
+      <div class="roleplay-scenario">
+        <div class="roleplay-role">你扮演：${rp.role}</div>
+        <div>${rp.scenario}</div>
+      </div>
+      <div class="chat-container" id="chatContainer">${chatHtml.join('')}</div>`;
+
+    if (lineIdx < rp.lines.length) {
+      const line = rp.lines[lineIdx];
+      if (line.speaker === 'other') {
+        chatHtml.push(`<div class="chat-bubble other">${line.en}<div class="cn">${line.cn}</div></div>`);
+        lineIdx++;
+        setTimeout(render, 300);
+        container.innerHTML = html;
+        return;
+      } else {
+        // User turn - show options
+        const options = generateRolePlayOptions(line);
+        window._currentRPAnswer = line.en;
+        html += `
+          <div class="chat-input-area">
+            <div class="chat-prompt">💬 ${line.cn}</div>
+            <div class="chat-options">
+              ${options.map((o, i) => `<button class="chat-option" id="rpOpt${i}" onclick="checkRolePlay(${i})">${o}</button>`).join('')}
+            </div>
+          </div>`;
+      }
+    } else {
+      const score = totalUser > 0 ? Math.round(correctCount / totalUser * 100) : 100;
+      if (score < 80) {
+        showGate('🎭', '角色扮演需要更多练习！', `正确率 ${score}%，需要达到80%才能完成。`, () => {
+          lineIdx = 0; correctCount = 0; chatHtml = []; answered = false; render();
+        });
+        return;
+      }
+      html += `<button class="next-step-btn" onclick="completeAllSteps()">完成今日学习 🎉</button>`;
+    }
+    container.innerHTML = html;
+    const chatC = document.getElementById('chatContainer');
+    if (chatC) chatC.scrollTop = chatC.scrollHeight;
+  }
+
+  window.checkRolePlay = (selected) => {
+    if (answered) return;
+    answered = true;
+    const correctAnswer = window._currentRPAnswer;
+    const btn = document.getElementById('rpOpt' + selected);
+    const isCorrect = btn.textContent.trim() === correctAnswer.trim();
+    if (isCorrect) {
+      correctCount++;
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+      document.querySelectorAll('.chat-option').forEach(b => {
+        if (b.textContent.trim() === correctAnswer.trim()) b.classList.add('correct');
+      });
+    }
+    chatHtml.push(`<div class="chat-bubble user">${correctAnswer}</div>`);
+    lineIdx++;
+    answered = false;
+    setTimeout(render, 1200);
+  };
+
+  render();
+}
+
+function generateRolePlayOptions(line) {
+  const correct = line.en;
+  const allLines = currentLesson.dialogue.map(d => d.en).filter(e => e !== correct);
+  const distractors = shuffleArray(allLines).slice(0, 2);
+  const options = shuffleArray([correct, ...distractors]);
+  return options;
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== Step Completion =====
+function completeStep(step, result) {
+  stepResults[step] = result || true;
+  if (step < 3) {
+    renderStep(step + 1);
+  }
+}
+
+function completeAllSteps() {
+  const key = `${currentLesson.category}_${currentLesson.day}`;
+  state.completedDays[key] = true;
+
+  // Update current day
+  if (!state.currentDay[currentLesson.category] || currentLesson.day >= state.currentDay[currentLesson.category]) {
+    state.currentDay[currentLesson.category] = currentLesson.day + 1;
+  }
+
+  // Update streak
+  const today = new Date().toISOString().slice(0, 10);
+  if (state.lastCheckIn !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    state.streakCount = (state.lastCheckIn === yesterday) ? state.streakCount + 1 : 1;
+    state.lastCheckIn = today;
+  }
+
+  // Update vocab count
+  state.vocabLearned += currentLesson.vocabulary.length;
+
+  // Save exercise history
+  if (stepResults[2] && typeof stepResults[2] === 'object') {
+    state.exerciseHistory.push({
+      date: today,
+      correct: stepResults[2].correct,
+      total: stepResults[2].total
+    });
+  }
+
+  saveState(state);
+  showResult();
+}
+
+function showResult() {
+  const exerciseResult = stepResults[2] || { correct: 0, total: 0 };
+  const score = exerciseResult.total > 0 ? Math.round(exerciseResult.correct / exerciseResult.total * 100) : 100;
+
+  document.getElementById('resultContent').innerHTML = `
+    <div class="result-card">
+      <div class="result-icon">🎉</div>
+      <div class="result-title">今日学习完成！</div>
+      <div class="result-desc">Day ${currentLesson.day}: ${currentLesson.titleCn}</div>
+      <div class="result-stats">
+        <div class="result-stat-item">
+          <div class="result-stat-value">${currentLesson.vocabulary.length}</div>
+          <div class="result-stat-label">新词汇</div>
+        </div>
+        <div class="result-stat-item">
+          <div class="result-stat-value">${score}%</div>
+          <div class="result-stat-label">测试正确率</div>
+        </div>
+        <div class="result-stat-item">
+          <div class="result-stat-value">${state.streakCount}</div>
+          <div class="result-stat-label">连续打卡</div>
+        </div>
+      </div>
+      <button class="primary-btn" onclick="showPage('pageDashboard')">返回首页</button>
+      <button class="secondary-btn" onclick="showDayList('${currentLesson.category}')">继续下一课</button>
+    </div>`;
+  showPage('pageResult');
+}
+
+// ===== Gate System =====
+function showGate(icon, title, desc, retryFn) {
+  document.getElementById('gateIcon').textContent = icon;
+  document.getElementById('gateTitle').textContent = title;
+  document.getElementById('gateDesc').textContent = desc;
+  document.getElementById('gateOverlay').classList.add('show');
+  window._gateRetryFn = retryFn;
+}
+
+function closeGate() {
+  document.getElementById('gateOverlay').classList.remove('show');
+  if (window._gateRetryFn) window._gateRetryFn();
+}
+
+// ===== Spaced Repetition =====
+function addToReviewPool(vocabItem, category, day, initialInterval) {
+  state = getState();
+  const exists = state.reviewPool.find(r => r.word === vocabItem.word);
+  if (!exists) {
+    state.reviewPool.push({
+      word: vocabItem.word,
+      meaning: vocabItem.meaning,
+      example: vocabItem.example,
+      exampleCn: vocabItem.exampleCn,
+      nextReview: new Date(Date.now() + initialInterval * 86400000).toISOString().slice(0, 10),
+      interval: initialInterval,
+      category,
+      day
+    });
+    saveState(state);
+  }
+}
+
+function getDueReviews() {
+  const today = new Date().toISOString().slice(0, 10);
+  return state.reviewPool.filter(r => r.nextReview <= today);
+}
+
+function renderReview() {
+  state = getState();
+  const due = getDueReviews();
+  const upcoming = state.reviewPool.filter(r => r.nextReview > new Date().toISOString().slice(0, 10));
+
+  let html = '';
+  if (due.length === 0 && upcoming.length === 0) {
+    html = `<div class="empty-state"><div class="icon">📚</div><div class="text">暂无待复习内容<br>学习过程中标记"模糊"或"不认识"的词汇会出现在这里</div></div>`;
+  } else {
+    if (due.length > 0) {
+      html += `<div class="section-title">待复习 (${due.length})</div>
+        <div style="margin:0 16px 12px"><button class="primary-btn" onclick="startReviewSession()">开始复习</button></div>
+        <div class="review-list">`;
+      due.forEach(r => {
+        html += `<div class="review-item">
+          <div><div class="review-word">${r.word}</div><div class="review-meaning">${r.meaning}</div></div>
+          <div class="review-due now">待复习</div>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    if (upcoming.length > 0) {
+      html += `<div class="section-title" style="margin-top:20px">即将复习 (${upcoming.length})</div>
+        <div class="review-list">`;
+      upcoming.slice(0, 10).forEach(r => {
+        html += `<div class="review-item">
+          <div><div class="review-word">${r.word}</div><div class="review-meaning">${r.meaning}</div></div>
+          <div class="review-due later">${r.nextReview}</div>
+        </div>`;
+      });
+      html += '</div>';
+    }
+  }
+  document.getElementById('reviewContent').innerHTML = html;
+}
+
+function startReviewSession() {
+  const due = getDueReviews();
+  if (due.length === 0) { showToast('没有待复习的词汇'); return; }
+
+  let idx = 0;
+  let flipped = false;
+
+  function render() {
+    if (idx >= due.length) {
+      showToast('复习完成！');
+      renderReview();
+      return;
+    }
+    const r = due[idx];
+    flipped = false;
+    const content = document.getElementById('reviewContent');
+    content.innerHTML = `
+      <div style="margin:16px">
+        <div class="flashcard-counter">复习 ${idx + 1} / ${due.length}</div>
+        <div class="flashcard-container">
+          <div class="flashcard" id="reviewCard" onclick="document.getElementById('reviewCard').classList.add('flipped');document.getElementById('reviewRating').classList.remove('hidden')">
+            <div class="flashcard-front">
+              <div class="flashcard-word">${r.word}</div>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:16px">点击翻转查看释义</div>
+            </div>
+            <div class="flashcard-back">
+              <div class="flashcard-meaning">${r.meaning}</div>
+              <div class="flashcard-example">${r.example || ''}</div>
+              <div class="flashcard-example" style="opacity:0.7;margin-top:4px">${r.exampleCn || ''}</div>
+            </div>
+          </div>
+        </div>
+        <div class="flashcard-rating hidden" id="reviewRating">
+          <button class="rating-btn know" onclick="reviewRate('know',${idx})">掌握了 👍</button>
+          <button class="rating-btn fuzzy" onclick="reviewRate('fuzzy',${idx})">还是模糊 🤔</button>
+          <button class="rating-btn unknown" onclick="reviewRate('unknown',${idx})">还不认识 😅</button>
+        </div>
+      </div>`;
+  }
+
+  window.reviewRate = (rating, i) => {
+    const item = state.reviewPool.find(r => r.word === due[i].word);
+    if (item) {
+      if (rating === 'know') {
+        item.interval = Math.min(item.interval * 2, 30);
+      } else if (rating === 'fuzzy') {
+        item.interval = Math.max(item.interval, 2);
+      } else {
+        item.interval = 1;
+      }
+      item.nextReview = new Date(Date.now() + item.interval * 86400000).toISOString().slice(0, 10);
+      saveState(state);
+    }
+    idx++;
+    render();
+  };
+
+  render();
+}
+
+// ===== Profile =====
+function renderProfile() {
+  state = getState();
+  const totalCompleted = Object.keys(state.completedDays).length;
+  const workDone = Object.keys(state.completedDays).filter(k => k.startsWith('work_')).length;
+  const travelDone = Object.keys(state.completedDays).filter(k => k.startsWith('travel_')).length;
+  const lifeDone = Object.keys(state.completedDays).filter(k => k.startsWith('life_')).length;
+
+  let html = `
+    <div class="profile-card">
+      <div class="profile-stat-grid">
+        <div class="profile-stat"><div class="value">${state.streakCount}</div><div class="label">连续打卡</div></div>
+        <div class="profile-stat"><div class="value">${totalCompleted}</div><div class="label">完成课程</div></div>
+        <div class="profile-stat"><div class="value">${state.vocabLearned}</div><div class="label">学习词汇</div></div>
+        <div class="profile-stat"><div class="value">${state.reviewPool.length}</div><div class="label">复习池</div></div>
+      </div>
+    </div>
+    <div class="section-title">场景进度</div>
+    <div class="profile-card">`;
+
+  [{ name: '工作', done: workDone, total: 20, color: '#4A90D9' },
+   { name: '旅游', done: travelDone, total: 20, color: '#34C759' },
+   { name: '生活', done: lifeDone, total: 20, color: '#FF9500' }].forEach(s => {
+    const pct = Math.round(s.done / s.total * 100);
+    html += `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px">
+          <span>${s.name}</span><span>${s.done}/${s.total}</span>
+        </div>
+        <div class="score-bar">
+          <div class="score-bar-fill"><div class="score-bar-inner" style="width:${pct}%;background:${s.color}"></div></div>
+          <div class="score-bar-text">${pct}%</div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+
+  // Calendar
+  html += `<div class="section-title">打卡日历</div><div class="profile-card">`;
+  html += renderCalendar();
+  html += '</div>';
+
+  // Reset button
+  html += `<div style="margin:24px 16px;text-align:center">
+    <button class="secondary-btn" onclick="if(confirm('确定要重置所有学习数据吗？此操作不可撤销。')){localStorage.removeItem('${APP_KEY}');state=getState();renderDashboard();showPage('pageDashboard');showToast('数据已重置')}">重置学习数据</button>
+  </div>`;
+
+  document.getElementById('profileContent').innerHTML = html;
+}
+
+function renderCalendar() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  let html = `<div style="text-align:center;font-weight:600;margin-bottom:12px">${year}年${monthNames[month]}</div>`;
+  html += '<div class="calendar-grid">';
+  ['日','一','二','三','四','五','六'].forEach(d => {
+    html += `<div class="calendar-day-header">${d}</div>`;
+  });
+
+  for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day"></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isChecked = state.lastCheckIn === dateStr ||
+      state.exerciseHistory.some(h => h.date === dateStr);
+    const isToday = d === today;
+    let cls = 'calendar-day';
+    if (isChecked) cls += ' checked';
+    if (isToday) cls += ' today';
+    html += `<div class="${cls}">${d}</div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  if (!state.currentDay.work) state.currentDay.work = 1;
+  if (!state.currentDay.travel) state.currentDay.travel = 1;
+  if (!state.currentDay.life) state.currentDay.life = 1;
+  saveState(state);
+  renderDashboard();
+});
+</script>
+</body>
+</html>
