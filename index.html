@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>英语每日打卡 - DailyEnglish</title>
+<title>英语学习 - DailyEnglish</title>
 <style>
 /* ============================================
    今敏 (Satoshi Kon) 动漫风格主题
@@ -341,7 +341,6 @@ body > * { position: relative; z-index: 1; }
   0%, 100% { box-shadow: 0 0 12px rgba(232,168,56,0.2); }
   50% { box-shadow: 0 0 24px rgba(232,168,56,0.5); }
 }
-.day-cell.locked { opacity: 0.3; cursor: not-allowed; }
 .day-cell .day-num { font-size: 18px; }
 .day-cell .day-label { font-size: 9px; color: var(--text-secondary); margin-top: 2px; }
 .day-cell .check-mark {
@@ -1092,12 +1091,12 @@ body > * { position: relative; z-index: 1; }
 <div class="page active" id="pageDashboard">
   <div class="header">
     <h1>DailyEnglish</h1>
-    <div class="subtitle">每日英语打卡，轻松掌握实用口语</div>
+    <div class="subtitle">轻松掌握实用英语口语</div>
   </div>
 
   <div class="streak-card">
     <div class="streak-number" id="streakCount">0</div>
-    <div class="streak-label">连续打卡天数</div>
+    <div class="streak-label">已完成课程</div>
   </div>
 
   <div class="stats-row">
@@ -1265,8 +1264,7 @@ function showToast(msg) {
 // ===== Dashboard =====
 function renderDashboard() {
   state = getState();
-  updateStreak();
-  document.getElementById('streakCount').textContent = state.streakCount;
+  document.getElementById('streakCount').textContent = Object.keys(state.completedDays).length;
   document.getElementById('totalWords').textContent = state.vocabLearned;
   document.getElementById('totalDays').textContent = Object.keys(state.completedDays).length;
 
@@ -1316,16 +1314,6 @@ function renderDashboard() {
   document.getElementById('categoryCards').innerHTML = cardsHtml;
 }
 
-function updateStreak() {
-  const today = new Date().toISOString().slice(0, 10);
-  if (state.lastCheckIn === today) return;
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  if (state.lastCheckIn !== yesterday && state.lastCheckIn !== today) {
-    state.streakCount = 0;
-  }
-  saveState(state);
-}
-
 // ===== Day List =====
 function showDayList(category) {
   const titles = { work: '工作场景', travel: '旅游场景', life: '生活场景' };
@@ -1338,7 +1326,6 @@ function showDayList(category) {
     { name: 'L3 熟练', days: data.filter(d => d.level === 3) },
   ];
 
-  const currentDay = state.currentDay[category] || 1;
   let html = '<div class="day-grid">';
   levels.forEach(level => {
     if (level.days.length === 0) return;
@@ -1346,14 +1333,9 @@ function showDayList(category) {
     level.days.forEach(d => {
       const key = `${category}_${d.day}`;
       const isCompleted = state.completedDays[key];
-      const isCurrent = d.day === currentDay && !isCompleted;
-      const isLocked = d.day > currentDay && !isCompleted;
-      let cls = '';
-      if (isCompleted) cls = 'completed';
-      else if (isCurrent) cls = 'current';
-      else if (isLocked) cls = 'locked';
+      let cls = isCompleted ? 'completed' : '';
       html += `
-        <div class="day-cell ${cls}" onclick="${isLocked ? '' : `startLesson('${category}',${d.day})`}">
+        <div class="day-cell ${cls}" onclick="startLesson('${category}',${d.day})">
           ${isCompleted ? '<span class="check-mark">✓</span>' : ''}
           <div class="day-num">${d.day}</div>
           <div class="day-label">${d.titleCn.slice(0, 4)}</div>
@@ -1688,18 +1670,7 @@ function completeAllSteps() {
   const key = `${currentLesson.category}_${currentLesson.day}`;
   state.completedDays[key] = true;
 
-  // Update current day
-  if (!state.currentDay[currentLesson.category] || currentLesson.day >= state.currentDay[currentLesson.category]) {
-    state.currentDay[currentLesson.category] = currentLesson.day + 1;
-  }
-
-  // Update streak
   const today = new Date().toISOString().slice(0, 10);
-  if (state.lastCheckIn !== today) {
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-    state.streakCount = (state.lastCheckIn === yesterday) ? state.streakCount + 1 : 1;
-    state.lastCheckIn = today;
-  }
 
   // Update vocab count
   state.vocabLearned += currentLesson.vocabulary.length;
@@ -1724,7 +1695,7 @@ function showResult() {
   document.getElementById('resultContent').innerHTML = `
     <div class="result-card">
       <div class="result-icon">🎉</div>
-      <div class="result-title">今日学习完成！</div>
+      <div class="result-title">学习完成！</div>
       <div class="result-desc">Day ${currentLesson.day}: ${currentLesson.titleCn}</div>
       <div class="result-stats">
         <div class="result-stat-item">
@@ -1736,8 +1707,8 @@ function showResult() {
           <div class="result-stat-label">测试正确率</div>
         </div>
         <div class="result-stat-item">
-          <div class="result-stat-value">${state.streakCount}</div>
-          <div class="result-stat-label">连续打卡</div>
+          <div class="result-stat-value">${Object.keys(state.completedDays).length}</div>
+          <div class="result-stat-label">已完成课程</div>
         </div>
       </div>
       <button class="primary-btn" onclick="showPage('pageDashboard')">返回首页</button>
@@ -1891,7 +1862,7 @@ function renderProfile() {
   let html = `
     <div class="profile-card">
       <div class="profile-stat-grid">
-        <div class="profile-stat"><div class="value">${state.streakCount}</div><div class="label">连续打卡</div></div>
+        <div class="profile-stat"><div class="value">${totalCompleted}</div><div class="label">完成课程</div></div>
         <div class="profile-stat"><div class="value">${totalCompleted}</div><div class="label">完成课程</div></div>
         <div class="profile-stat"><div class="value">${state.vocabLearned}</div><div class="label">学习词汇</div></div>
         <div class="profile-stat"><div class="value">${state.reviewPool.length}</div><div class="label">复习池</div></div>
@@ -1900,9 +1871,9 @@ function renderProfile() {
     <div class="section-title">场景进度</div>
     <div class="profile-card">`;
 
-  [{ name: '工作', done: workDone, total: 20, color: '#4A90D9' },
-   { name: '旅游', done: travelDone, total: 20, color: '#34C759' },
-   { name: '生活', done: lifeDone, total: 20, color: '#FF9500' }].forEach(s => {
+  [{ name: '工作', done: workDone, total: 10, color: '#4A90D9' },
+   { name: '旅游', done: travelDone, total: 10, color: '#34C759' },
+   { name: '生活', done: lifeDone, total: 10, color: '#FF9500' }].forEach(s => {
     const pct = Math.round(s.done / s.total * 100);
     html += `
       <div style="margin-bottom:12px">
@@ -1918,7 +1889,7 @@ function renderProfile() {
   html += '</div>';
 
   // Calendar
-  html += `<div class="section-title">打卡日历</div><div class="profile-card">`;
+  html += `<div class="section-title">学习记录</div><div class="profile-card">`;
   html += renderCalendar();
   html += '</div>';
 
